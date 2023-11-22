@@ -5,6 +5,7 @@ const OTP = require("../models/OTP");
 const otpGenerator = require("otp-generator");
 require("dotenv").config();
 //signup handle
+
 exports.signup = async (req, res) => {
   try {
     //get input data
@@ -20,10 +21,12 @@ exports.signup = async (req, res) => {
 
     //check if use already exists?
     const existingUser = await user.findOne({ email });
-    if (existingUser) {
+    const existingOtp = await OTP.findOne({ email });
+    if (existingUser && existingUser?.verified) {
+      console.log("existingOtp", existingOtp);
       return res.status(400).json({
         success: false,
-        message: "User already exists",
+        message: "User already exists.",
       });
     }
 
@@ -57,6 +60,7 @@ exports.signup = async (req, res) => {
       User,
       otp: otp,
       message: "user created successfully ✅",
+      verified: false,
     });
   } catch (error) {
     console.error(error);
@@ -174,5 +178,43 @@ exports.sendotp = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     return res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+exports.verifyOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(403).json({
+        success: false,
+        message: "Email and OTP are required",
+      });
+    }
+
+    // Check if OTP exists for the given email
+    const existingOtp = await OTP.findOne({ email, otp });
+
+    if (!existingOtp) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid OTP",
+      });
+    }
+
+    // Update OTP status as verified
+    await OTP.findOneAndUpdate({ email, otp }, { $set: { verified: true } });
+    await user.findOneAndUpdate({ email }, { $set: { verified: true } });
+
+    return res.status(200).json({
+      success: true,
+      message: "OTP verification successful ✅",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "OTP verification failed",
+    });
   }
 };

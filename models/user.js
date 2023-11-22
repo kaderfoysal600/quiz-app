@@ -11,7 +11,11 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   phoneNo: {
-    type: Number,
+    type: String,
+    required: false,
+  },
+  verified: {
+    type: Boolean,
     required: false,
   },
 
