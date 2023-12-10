@@ -1,10 +1,15 @@
-import categoryController from "../controllers/categoryController";
+const {
+  createCategory,
+  getAllCategories,
+  createSubcategory,
+  getAllSubcategories,
+} = require("../controllers/categoryController");
 const express = require("express");
 const router = express.Router();
 
-router.post("/categories", categoryController.createCategory);
-router.get("/categories", categoryController.getAllCategories);
-router.post("/subcategories", subcategoryController.createSubcategory);
-router.get("/subcategories", subcategoryController.getAllSubcategories);
+router.post("/categories", createCategory);
+router.get("/categories", getAllCategories);
+router.post("/subcategories", createSubcategory);
+router.get("/subcategories", getAllSubcategories);
 
 module.exports = router;
