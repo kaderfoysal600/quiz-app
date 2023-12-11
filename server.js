@@ -11,7 +11,8 @@ app.use(express.json());
 require("./config/database").connect();
 //route importing and mounting
 const user = require("./routes/user");
-const categoryRouter = require("./routes/category");
+// const categoryRouter = require("./routes/category");
+const categoryRouter = require("./routes/catRoutes");
 // const category = require("./routes/category");
 app.use("/api/v1", user);
 app.use("/api/v1", categoryRouter);
