@@ -14,8 +14,11 @@ const user = require("./routes/user");
 // const categoryRouter = require("./routes/category");
 const categoryRouter = require("./routes/catRoutes");
 // const category = require("./routes/category");
+
+const quizRouter = require("./routes/quizRoutes");
 app.use("/api/v1", user);
 app.use("/api/v1", categoryRouter);
+app.use("/api/v1", quizRouter);
 
 app.listen(PORT, () => {
   console.log("Server Started");

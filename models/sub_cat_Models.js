@@ -6,8 +6,6 @@ const mongoose = require("mongoose");
 
 const SubCategory_schema =  mongoose.Schema({
 
-    // category : category_schema,
-
     category_Id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
@@ -22,26 +20,7 @@ const SubCategory_schema =  mongoose.Schema({
     description: {
         type: String,
         required: true
-    },
-
-    price : {
-        type: Number,
-        default:0
-    },
-
-    // category_id: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'Category',
-    //     required:true
-    // },
-
-
-    countInStock: {
-        type: Number,
-        required: true,
-        min: 0,
-        max: 255
-    },
+    }
 
 },
 {

@@ -12,6 +12,11 @@ const {
   updateSubCategory,
   deleteCategory,
   deleteSubCategory,
+  getSubSubCategories,
+  createSubSubCategory,
+  getSubSubCategoryById,
+  updateSubSubCategory,
+  deleteSubSubCategory,
 } = require("../controllers/control");
 
 const validateToken = require("../middleware/errorhandler");
@@ -29,6 +34,12 @@ router.route("/category").get(getCategory).post(createCategory);
 
 //@ For Read & Write SubCategory
 router.route("/subcategory").get(getSubCategory).post(createSubCategory);
+
+//@ For Read & Write SubSubCategory
+router
+  .route("/subSubcategory")
+  .get(getSubSubCategories)
+  .post(createSubSubCategory);
 
 //@ For delete update and read by id Category
 router
