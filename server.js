@@ -1,9 +1,17 @@
 const express = require("express");
 
 const app = express();
+const cors = require("cors");
+const corsOptions = {
+  origin: "http://localhost:4200",
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
 
+// Enable CORS for a specific origin
+app.use(cors(corsOptions));
+// app.use(cors());
 require("dotenv").config();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
