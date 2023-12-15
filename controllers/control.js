@@ -115,6 +115,7 @@ const updateCategory = asyncHandler(async (req, res) => {
 
 //@desc Update SubCategory
 //@route PUT /SubCategory/:id
+
 //@access private
 const updateSubCategory = asyncHandler(async (req, res) => {
   const Sub_Cat_Data = await SubCategory.findById(req.params.id);
@@ -173,6 +174,7 @@ const getSubSubCategories = asyncHandler(async (req, res) => {
 // Create new sub-sub-category
 const createSubSubCategory = asyncHandler(async (req, res) => {
   const { sub_category_Id, name, description } = req.body;
+  
 
   if (!sub_category_Id || !name || !description) {
     throw new Error("Please fill all required fields.");
