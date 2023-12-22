@@ -40,7 +40,7 @@ const createQuiz = asyncHandler(async (req, res) => {
   const quizzes = [];
 
   for (const quizData of quizzesData) {
-    const { question, options, correctOption } = quizData;
+    const { question, options, correctOption, questionStartDate } = quizData;
 
     if (
       !question ||
@@ -59,6 +59,7 @@ const createQuiz = asyncHandler(async (req, res) => {
       options: quizData.options.map((option) => option.value),
       correctOption,
       subSubCategoryId: subSubCategoryId,
+      questionStartDate: questionStartDate,
     });
 
     quizzes.push(quiz);

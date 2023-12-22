@@ -21,8 +21,16 @@ const getCategory = asyncHandler(async (req, res) => {
 //@route GET all Sub_subcategory
 //@access private
 const getSubCategory = asyncHandler(async (req, res) => {
-  const Sub_category_name = await SubCategory.find(req.params);
-  res.status(200).json(Sub_category_name);
+  // Use populate to include category information
+  const subcategories = await SubCategory.find(req.params)
+    .populate({
+      path: "category_Id",
+      model: "Category",
+      select: "name", // Select the fields you want from the Category model
+    })
+    .exec();
+
+  res.status(200).json(subcategories);
 });
 
 //@desc Create New Category
@@ -167,14 +175,25 @@ const deleteSubCategory = asyncHandler(async (req, res) => {
 
 // Get all sub-sub-categories
 const getSubSubCategories = asyncHandler(async (req, res) => {
-  const sub_sub_categories = await SubSubCategory.find(req.params);
-  res.status(200).json(sub_sub_categories);
+  // Use populate to include sub-category information
+  const subSubCategories = await SubSubCategory.find(req.params)
+    .populate({
+      path: "sub_category_Id",
+      model: "SubCategory",
+      populate: {
+        path: "category_Id",
+        model: "Category",
+        select: "name", // Select the fields you want from the Category model
+      },
+    })
+    .exec();
+
+  res.status(200).json(subSubCategories);
 });
 
 // Create new sub-sub-category
 const createSubSubCategory = asyncHandler(async (req, res) => {
   const { sub_category_Id, name, description } = req.body;
-  
 
   if (!sub_category_Id || !name || !description) {
     throw new Error("Please fill all required fields.");
