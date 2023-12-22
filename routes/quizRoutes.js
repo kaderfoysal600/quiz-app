@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { createQuiz } = require("../controllers/quizController");
+const { createQuiz, getAllQuizzes } = require("../controllers/quizController");
 
 const validateToken = require("../middleware/errorhandler");
 
@@ -14,6 +14,6 @@ router.get("/", (req, res) => {
 });
 
 //@ For Read & Write Category
-router.route("/quiz").post(createQuiz);
+router.route("/quiz").get(getAllQuizzes).post(createQuiz);
 
 module.exports = router;

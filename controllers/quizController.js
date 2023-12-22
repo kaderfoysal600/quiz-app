@@ -1,31 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Quiz = require("../models/quizModel");
 const mongoose = require("mongoose");
-// const createQuiz = asyncHandler(async (req, res) => {
-//   console.log("req.body", req.body);
-//   const { question, options, correctOption, subSubCategoryId } = req.body;
-
-//   if (
-//     !question ||
-//     !options ||
-//     options.length !== 4 ||
-//     !correctOption ||
-//     !subSubCategoryId
-//   ) {
-//     throw new Error(
-//       "Invalid quiz data. Please provide a valid question, 4 options, correct option, and sub-subcategory ID."
-//     );
-//   }
-
-//   const quiz = await Quiz.create({
-//     question,
-//     options,
-//     correctOption,
-//     subSubCategoryId,
-//   });
-
-//   res.status(201).json(quiz);
-// });
 
 const createQuiz = asyncHandler(async (req, res) => {
   console.log("req.query.subSubCatId", req.query.subSubCatId);
@@ -67,10 +42,16 @@ const createQuiz = asyncHandler(async (req, res) => {
 
   res.status(201).json(quizzes);
 });
+// Get all quizzes
+const getAllQuizzes = asyncHandler(async (req, res) => {
+  const quizzes = await Quiz.find(); // Assuming Quiz is your Mongoose model for quizzes
+  res.status(200).json(quizzes);
+});
 
 // Add more controllers as needed (e.g., getQuiz, updateQuiz, deleteQuiz, etc.)
 
 module.exports = {
   createQuiz,
+  getAllQuizzes
   // Add other controllers here
 };
