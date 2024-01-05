@@ -20,6 +20,19 @@ const getCategory = asyncHandler(async (req, res) => {
 //@desc Get all Subcategory
 //@route GET all Sub_subcategory
 //@access private
+// const getSubCategory = asyncHandler(async (req, res) => {
+//   // Use populate to include category information
+//   const subcategories = await SubCategory.find(req.params)
+//     .populate({
+//       path: "category_Id",
+//       model: "Category",
+//       select: "name", // Select the fields you want from the Category model
+//     })
+//     .exec();
+
+//   res.status(200).json(subcategories);
+// });
+
 const getSubCategory = asyncHandler(async (req, res) => {
   // Use populate to include category information
   const subcategories = await SubCategory.find(req.params)
@@ -30,7 +43,81 @@ const getSubCategory = asyncHandler(async (req, res) => {
     })
     .exec();
 
-  res.status(200).json(subcategories);
+  // Organize subcategories by category
+  const organizedData = {};
+
+  subcategories.forEach((subCategory) => {
+    const categoryId = subCategory.category_Id._id;
+    const categoryName = subCategory.category_Id.name;
+
+    // Create category object if it doesn't exist
+    if (!organizedData[categoryId]) {
+      organizedData[categoryId] = {
+        category_id: categoryId,
+        category_name: categoryName,
+        sub_categories: [],
+      };
+    }
+
+    // Remove category_Id field and add subcategory to the category
+    const { category_Id, ...subcategoryWithoutCategoryId } =
+      subCategory.toObject();
+    organizedData[categoryId].sub_categories.push(subcategoryWithoutCategoryId);
+  });
+
+  // Convert the object values to an array
+  const resultArray = Object.values(organizedData);
+
+  res.status(200).json(resultArray);
+});
+
+const getSubCategoryByCategory = asyncHandler(async (req, res) => {
+  const categoryIdFromHeader = req.headers["category-id"];
+
+  if (!categoryIdFromHeader) {
+    return res
+      .status(400)
+      .json({ error: "Category ID not provided in the header" });
+  }
+
+  // Use populate to include category information and filter by category ID
+  const subcategories = await SubCategory.find({
+    ...req.params,
+    category_Id: categoryIdFromHeader,
+  })
+    .populate({
+      path: "category_Id",
+      model: "Category",
+      select: "name", // Select the fields you want from the Category model
+    })
+    .exec();
+
+  // Organize subcategories by category
+  const organizedData = {};
+
+  subcategories.forEach((subCategory) => {
+    const categoryId = subCategory.category_Id._id;
+    const categoryName = subCategory.category_Id.name;
+
+    // Create category object if it doesn't exist
+    if (!organizedData[categoryId]) {
+      organizedData[categoryId] = {
+        category_id: categoryId,
+        category_name: categoryName,
+        sub_categories: [],
+      };
+    }
+
+    // Remove category_Id field and add subcategory to the category
+    const { category_Id, ...subcategoryWithoutCategoryId } =
+      subCategory.toObject();
+    organizedData[categoryId].sub_categories.push(subcategoryWithoutCategoryId);
+  });
+
+  // Convert the object values to an array
+  const resultArray = Object.values(organizedData);
+
+  res.status(200).json(resultArray);
 });
 
 //@desc Create New Category
@@ -174,8 +261,25 @@ const deleteSubCategory = asyncHandler(async (req, res) => {
 });
 
 // Get all sub-sub-categories
+// const getSubSubCategories = asyncHandler(async (req, res) => {
+//   // Use populate to include sub-category information
+//   const subSubCategories = await SubSubCategory.find(req.params)
+//     .populate({
+//       path: "sub_category_Id",
+//       model: "SubCategory",
+//       populate: {
+//         path: "category_Id",
+//         model: "Category",
+//         select: "name", // Select the fields you want from the Category model
+//       },
+//     })
+//     .exec();
+
+//   res.status(200).json(subSubCategories);
+// });
+
 const getSubSubCategories = asyncHandler(async (req, res) => {
-  // Use populate to include sub-category information
+  // Use populate to include sub-category and category information
   const subSubCategories = await SubSubCategory.find(req.params)
     .populate({
       path: "sub_category_Id",
@@ -188,7 +292,89 @@ const getSubSubCategories = asyncHandler(async (req, res) => {
     })
     .exec();
 
-  res.status(200).json(subSubCategories);
+  // Organize sub-subcategories by sub-category and category
+  const organizedData = {};
+
+  subSubCategories.forEach((subSubCategory) => {
+    const subCategoryId = subSubCategory.sub_category_Id._id;
+    const categoryId = subSubCategory.sub_category_Id.category_Id._id;
+
+    // Create sub-category object if it doesn't exist
+    if (!organizedData[subCategoryId]) {
+      organizedData[subCategoryId] = {
+        sub_category_Id: subCategoryId,
+        category_Id: categoryId,
+        subSubCategories: [],
+      };
+    }
+
+    // Remove unnecessary fields and add sub-subcategory to the sub-category
+    const { sub_category_Id, ...subSubCategoryWithoutSubCategoryId } =
+      subSubCategory.toObject();
+    organizedData[subCategoryId].subSubCategories.push(
+      subSubCategoryWithoutSubCategoryId
+    );
+  });
+
+  // Convert the object values to an array
+  const resultArray = Object.values(organizedData);
+
+  res.status(200).json(resultArray);
+});
+
+const getSubSubCategoriesBySub = asyncHandler(async (req, res) => {
+  const subCategoryIdFromHeader = req.headers["sub-category-id"];
+
+  if (!subCategoryIdFromHeader) {
+    return res
+      .status(400)
+      .json({ error: "Sub-Category ID not provided in the header" });
+  }
+
+  // Use populate to include sub-category and category information and filter by sub-category ID
+  const subSubCategories = await SubSubCategory.find({
+    ...req.params,
+    sub_category_Id: subCategoryIdFromHeader,
+  })
+    .populate({
+      path: "sub_category_Id",
+      model: "SubCategory",
+      populate: {
+        path: "category_Id",
+        model: "Category",
+        select: "name", // Select the fields you want from the Category model
+      },
+    })
+    .exec();
+
+  // Organize sub-subcategories by sub-category and category
+  const organizedData = {};
+
+  subSubCategories.forEach((subSubCategory) => {
+    const subCategoryId = subSubCategory.sub_category_Id._id;
+    const categoryId = subSubCategory.sub_category_Id.category_Id._id;
+
+    // Create sub-category object if it doesn't exist
+    if (!organizedData[subCategoryId]) {
+      organizedData[subCategoryId] = {
+        sub_category_Id: subCategoryId,
+        category_Id: categoryId,
+        subSubCategories: [],
+      };
+    }
+
+    // Remove unnecessary fields and add sub-subcategory to the sub-category
+    const { sub_category_Id, ...subSubCategoryWithoutSubCategoryId } =
+      subSubCategory.toObject();
+    organizedData[subCategoryId].subSubCategories.push(
+      subSubCategoryWithoutSubCategoryId
+    );
+  });
+
+  // Convert the object values to an array
+  const resultArray = Object.values(organizedData);
+
+  res.status(200).json(resultArray);
 });
 
 // Create new sub-sub-category
@@ -265,4 +451,6 @@ module.exports = {
   getSubSubCategoryById,
   updateSubSubCategory,
   deleteSubSubCategory,
+  getSubCategoryByCategory,
+  getSubSubCategoriesBySub,
 };

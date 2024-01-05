@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-
+const { auth } = require("../middlewares/authMiddle");
 const {
   getCategory,
   getSubCategory,
@@ -17,6 +17,8 @@ const {
   getSubSubCategoryById,
   updateSubSubCategory,
   deleteSubSubCategory,
+  getSubCategoryByCategory,
+  getSubSubCategoriesBySub,
 } = require("../controllers/control");
 
 const validateToken = require("../middleware/errorhandler");
@@ -30,16 +32,25 @@ router.get("/", (req, res) => {
 });
 
 //@ For Read & Write Category
+router.use("/category", auth);
 router.route("/category").get(getCategory).post(createCategory);
 
 //@ For Read & Write SubCategory
+router.use("/subcategory", auth);
 router.route("/subcategory").get(getSubCategory).post(createSubCategory);
 
+router.use("/subcategoryByCategory", auth);
+router.route("/subcategoryByCategory").get(getSubCategoryByCategory);
+
 //@ For Read & Write SubSubCategory
+router.use("/subSubcategory", auth);
 router
   .route("/subSubcategory")
   .get(getSubSubCategories)
   .post(createSubSubCategory);
+
+router.use("/subSubCategoryById", auth);
+router.route("/subSubCategoryById").get(getSubSubCategoriesBySub);
 
 //@ For delete update and read by id Category
 router
