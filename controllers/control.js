@@ -117,7 +117,7 @@ const getSubCategoryByCategory = asyncHandler(async (req, res) => {
   // Convert the object values to an array
   const resultArray = Object.values(organizedData);
 
-  res.status(200).json(resultArray);
+  res.status(200).json(resultArray[0]);
 });
 
 //@desc Create New Category
@@ -374,7 +374,7 @@ const getSubSubCategoriesBySub = asyncHandler(async (req, res) => {
   // Convert the object values to an array
   const resultArray = Object.values(organizedData);
 
-  res.status(200).json(resultArray);
+  res.status(200).json(resultArray[0]);
 });
 
 // Create new sub-sub-category

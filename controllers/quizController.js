@@ -44,14 +44,42 @@ const createQuiz = asyncHandler(async (req, res) => {
 });
 // Get all quizzes
 const getAllQuizzes = asyncHandler(async (req, res) => {
-  const quizzes = await Quiz.find(); // Assuming Quiz is your Mongoose model for quizzes
-  res.status(200).json(quizzes);
+  const subSubCategoryId = req.header("subSubCategoryId");
+  if (!subSubCategoryId) {
+    return res
+      .status(400)
+      .json({ error: "subSubCategoryId not provided in the header" });
+  }
+
+  const quizzes = await Quiz.find({ subSubCategoryId }); // Filter quizzes by subSubCategoryId
+
+  if (!quizzes || quizzes.length === 0) {
+    return res
+      .status(404)
+      .json({ error: "No quizzes found for the provided subSubCategoryId" });
+  }
+
+  const result = {
+    subSubCategoryId,
+    allQuestion: quizzes.map((quiz) => ({
+      _id: quiz._id,
+      question: quiz.question,
+      options: quiz.options,
+      correctOption: quiz.correctOption,
+      questionStartDate: quiz.questionStartDate,
+      createdAt: quiz.createdAt,
+      updatedAt: quiz.updatedAt,
+      __v: quiz.__v,
+    })),
+  };
+
+  res.status(200).json(result);
 });
 
 // Add more controllers as needed (e.g., getQuiz, updateQuiz, deleteQuiz, etc.)
 
 module.exports = {
   createQuiz,
-  getAllQuizzes
+  getAllQuizzes,
   // Add other controllers here
 };
