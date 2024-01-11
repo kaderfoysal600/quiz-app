@@ -125,7 +125,7 @@ const getSubCategoryByCategory = asyncHandler(async (req, res) => {
 //@access private
 const createCategory = asyncHandler(async (req, res) => {
   console.log("The request body of category is :", req.body);
-  const { name, description } = req.body;
+  const { name, description , defaultCategory} = req.body;
   if (!name || !description) {
     res.status(400);
     throw new Error("fill the all required field");
@@ -133,6 +133,7 @@ const createCategory = asyncHandler(async (req, res) => {
   const cate = await Category.create({
     name,
     description,
+    defaultCategory
   });
 
   res.status(201).json(cate);

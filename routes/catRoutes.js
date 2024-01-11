@@ -32,8 +32,12 @@ router.get("/", (req, res) => {
 });
 
 //@ For Read & Write Category
-router.use("/category", auth);
-router.route("/category").get(getCategory).post(createCategory);
+// router.use("/category", auth);
+// router.route("/category").post(createCategory);
+// router.route("/category").get(getCategory)
+router.route("/category")
+  .post(createCategory)
+  .get(auth, getCategory);
 
 //@ For Read & Write SubCategory
 router.use("/subcategory", auth);

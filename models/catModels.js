@@ -8,6 +8,10 @@ const category_schema = mongoose.Schema({
     description: {
     type: String,
     required: true
+  },
+  defaultCategory: {
+    type: Boolean,
+    default: false
   }
 
 });
