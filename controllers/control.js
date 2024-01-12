@@ -8,15 +8,10 @@ const { json } = require("body-parser");
 //@route GET all_category
 //@access private
 const getCategory = asyncHandler(async (req, res) => {
-  const category_name = await Category.find(
-    req.params
-    // name: req.params.name,
-    // description: req.description
-  );
+  const categories = await Category.find({}).sort({ defaultCategory: -1 });
 
-  res.status(200).json(category_name);
+  res.status(200).json(categories);
 });
-
 //@desc Get all Subcategory
 //@route GET all Sub_subcategory
 //@access private
