@@ -44,11 +44,12 @@ const createQuiz = asyncHandler(async (req, res) => {
 });
 // Get all quizzes
 const getAllQuizzes = asyncHandler(async (req, res) => {
-  const subSubCategoryId = req.header("subSubCategoryId");
+  const subSubCategoryId = req.params.subSubCategoryId; // Assuming your route has a parameter named 'subSubCategoryId'
+
   if (!subSubCategoryId) {
     return res
       .status(400)
-      .json({ error: "subSubCategoryId not provided in the header" });
+      .json({ error: "subSubCategoryId not provided in the parameters" });
   }
 
   const quizzes = await Quiz.find({ subSubCategoryId }); // Filter quizzes by subSubCategoryId
@@ -75,6 +76,7 @@ const getAllQuizzes = asyncHandler(async (req, res) => {
 
   res.status(200).json(result);
 });
+
 
 // Add more controllers as needed (e.g., getQuiz, updateQuiz, deleteQuiz, etc.)
 

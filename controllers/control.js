@@ -67,18 +67,17 @@ const getSubCategory = asyncHandler(async (req, res) => {
 });
 
 const getSubCategoryByCategory = asyncHandler(async (req, res) => {
-  const categoryIdFromHeader = req.headers["category-id"];
+  const categoryIdFromParams = req.params.categoryId; // Assuming your route has a parameter named 'categoryId'
 
-  if (!categoryIdFromHeader) {
+  if (!categoryIdFromParams) {
     return res
       .status(400)
-      .json({ error: "Category ID not provided in the header" });
+      .json({ error: "Category ID not provided in the parameters" });
   }
 
   // Use populate to include category information and filter by category ID
   const subcategories = await SubCategory.find({
-    ...req.params,
-    category_Id: categoryIdFromHeader,
+    category_Id: categoryIdFromParams,
   })
     .populate({
       path: "category_Id",
@@ -319,18 +318,17 @@ const getSubSubCategories = asyncHandler(async (req, res) => {
 });
 
 const getSubSubCategoriesBySub = asyncHandler(async (req, res) => {
-  const subCategoryIdFromHeader = req.headers["sub-category-id"];
+  const subCategoryIdFromParams = req.params.subCategoryId; // Assuming your route has a parameter named 'subCategoryId'
 
-  if (!subCategoryIdFromHeader) {
+  if (!subCategoryIdFromParams) {
     return res
       .status(400)
-      .json({ error: "Sub-Category ID not provided in the header" });
+      .json({ error: "Sub-Category ID not provided in the parameters" });
   }
 
   // Use populate to include sub-category and category information and filter by sub-category ID
   const subSubCategories = await SubSubCategory.find({
-    ...req.params,
-    sub_category_Id: subCategoryIdFromHeader,
+    sub_category_Id: subCategoryIdFromParams,
   })
     .populate({
       path: "sub_category_Id",
@@ -372,6 +370,7 @@ const getSubSubCategoriesBySub = asyncHandler(async (req, res) => {
 
   res.status(200).json(resultArray[0]);
 });
+
 
 // Create new sub-sub-category
 const createSubSubCategory = asyncHandler(async (req, res) => {

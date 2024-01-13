@@ -44,7 +44,7 @@ router.use("/subcategory", auth);
 router.route("/subcategory").get(getSubCategory).post(createSubCategory);
 
 router.use("/subcategoryByCategory", auth);
-router.route("/subcategoryByCategory").get(getSubCategoryByCategory);
+router.route("/subcategoryByCategory/:categoryId").get(getSubCategoryByCategory);
 
 //@ For Read & Write SubSubCategory
 router.use("/subSubcategory", auth);
@@ -54,7 +54,7 @@ router
   .post(createSubSubCategory);
 
 router.use("/subSubCategoryById", auth);
-router.route("/subSubCategoryById").get(getSubSubCategoriesBySub);
+router.route("/subSubCategoryById/:subCategoryId").get(getSubSubCategoriesBySub);
 
 //@ For delete update and read by id Category
 router

@@ -14,7 +14,11 @@ router.get("/", (req, res) => {
 });
 
 //@ For Read & Write Category
+// router.use("/quiz", auth);
+// router.route("/quiz").get(getAllQuizzes).post(createQuiz);
+
 router.use("/quiz", auth);
-router.route("/quiz").get(getAllQuizzes).post(createQuiz);
+router.route("/quiz").post(createQuiz);
+router.route("/quiz/:subSubCategoryId").get(getAllQuizzes)
 
 module.exports = router;
