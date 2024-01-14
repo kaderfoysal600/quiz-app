@@ -67,7 +67,7 @@ const getSubCategory = asyncHandler(async (req, res) => {
 });
 
 const getSubCategoryByCategory = asyncHandler(async (req, res) => {
-  const categoryIdFromParams = req.params.categoryId; // Assuming your route has a parameter named 'categoryId'
+  const categoryIdFromParams = req.params.categoryId;
 
   if (!categoryIdFromParams) {
     return res
@@ -82,7 +82,7 @@ const getSubCategoryByCategory = asyncHandler(async (req, res) => {
     .populate({
       path: "category_Id",
       model: "Category",
-      select: "name", // Select the fields you want from the Category model
+      select: "name",
     })
     .exec();
 
@@ -93,7 +93,6 @@ const getSubCategoryByCategory = asyncHandler(async (req, res) => {
     const categoryId = subCategory.category_Id._id;
     const categoryName = subCategory.category_Id.name;
 
-    // Create category object if it doesn't exist
     if (!organizedData[categoryId]) {
       organizedData[categoryId] = {
         category_id: categoryId,
@@ -102,17 +101,22 @@ const getSubCategoryByCategory = asyncHandler(async (req, res) => {
       };
     }
 
-    // Remove category_Id field and add subcategory to the category
     const { category_Id, ...subcategoryWithoutCategoryId } =
       subCategory.toObject();
     organizedData[categoryId].sub_categories.push(subcategoryWithoutCategoryId);
   });
 
-  // Convert the object values to an array
+  // Check if subcategories array is empty and construct response accordingly
   const resultArray = Object.values(organizedData);
+  const response =
+    resultArray.length > 0 ? resultArray[0] : {
+      category_id: categoryIdFromParams,
+      sub_categories: [],
+    };
 
-  res.status(200).json(resultArray[0]);
+  res.status(200).json(response);
 });
+
 
 //@desc Create New Category
 //@route POST /api/Category
@@ -318,7 +322,7 @@ const getSubSubCategories = asyncHandler(async (req, res) => {
 });
 
 const getSubSubCategoriesBySub = asyncHandler(async (req, res) => {
-  const subCategoryIdFromParams = req.params.subCategoryId; // Assuming your route has a parameter named 'subCategoryId'
+  const subCategoryIdFromParams = req.params.subCategoryId;
 
   if (!subCategoryIdFromParams) {
     return res
@@ -336,7 +340,7 @@ const getSubSubCategoriesBySub = asyncHandler(async (req, res) => {
       populate: {
         path: "category_Id",
         model: "Category",
-        select: "name", // Select the fields you want from the Category model
+        select: "name",
       },
     })
     .exec();
@@ -348,7 +352,6 @@ const getSubSubCategoriesBySub = asyncHandler(async (req, res) => {
     const subCategoryId = subSubCategory.sub_category_Id._id;
     const categoryId = subSubCategory.sub_category_Id.category_Id._id;
 
-    // Create sub-category object if it doesn't exist
     if (!organizedData[subCategoryId]) {
       organizedData[subCategoryId] = {
         sub_category_Id: subCategoryId,
@@ -357,7 +360,6 @@ const getSubSubCategoriesBySub = asyncHandler(async (req, res) => {
       };
     }
 
-    // Remove unnecessary fields and add sub-subcategory to the sub-category
     const { sub_category_Id, ...subSubCategoryWithoutSubCategoryId } =
       subSubCategory.toObject();
     organizedData[subCategoryId].subSubCategories.push(
@@ -365,11 +367,15 @@ const getSubSubCategoriesBySub = asyncHandler(async (req, res) => {
     );
   });
 
-  // Convert the object values to an array
-  const resultArray = Object.values(organizedData);
+  // Construct response object with category name and sub-category name even if no sub-subcategories are found
+  const response = organizedData[subCategoryIdFromParams] || {
+    sub_category_Id: subCategoryIdFromParams,
+    subSubCategories: [],
+  };
 
-  res.status(200).json(resultArray[0]);
+  res.status(200).json(response);
 });
+
 
 
 // Create new sub-sub-category
