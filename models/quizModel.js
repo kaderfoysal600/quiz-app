@@ -26,9 +26,9 @@ const QuizSchema = new mongoose.Schema(
         message: "Correct option must be a value between 0 and 3.",
       },
     },
-    subSubCategoryId: {
+    subCategoryId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "SubSubCategory",
+      ref: "SubCategory",
       required: true,
     },
     questionStartDate: {

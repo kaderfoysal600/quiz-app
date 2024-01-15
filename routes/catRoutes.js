@@ -37,23 +37,22 @@ router.get("/", (req, res) => {
 // router.route("/category").get(getCategory)
 router.route("/category")
   .post(createCategory)
-  .get(auth, getCategory);
+  .get(getCategory);
 
 //@ For Read & Write SubCategory
-router.use("/subcategory", auth);
 router.route("/subcategory").get(getSubCategory).post(createSubCategory);
 
-router.use("/subcategoryByCategory", auth);
+// router.use("/subcategoryByCategory", );
 router.route("/subcategoryByCategory/:categoryId").get(getSubCategoryByCategory);
 
 //@ For Read & Write SubSubCategory
-router.use("/subSubcategory", auth);
+// router.use("/subSubcategory", );
 router
   .route("/subSubcategory")
   .get(getSubSubCategories)
   .post(createSubSubCategory);
 
-router.use("/subSubCategoryById", auth);
+// router.use("/subSubCategoryById",);
 router.route("/subSubCategoryById/:subCategoryId").get(getSubSubCategoriesBySub);
 
 //@ For delete update and read by id Category

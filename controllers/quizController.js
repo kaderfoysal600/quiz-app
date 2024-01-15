@@ -3,11 +3,11 @@ const Quiz = require("../models/quizModel");
 const mongoose = require("mongoose");
 
 const createQuiz = asyncHandler(async (req, res) => {
-  console.log("req.query.subSubCatId", req.query.subSubCatId);
+  console.log("req.query.sub_category_id", req.query.subCatId);
   console.log("req.body", req.body);
   const quizzesData = req.body;
-  const subSubCategoryId = req.query.subSubCatId;
-  console.log("subSubCategoryId", subSubCategoryId);
+  const subCategoryId = req.query.subCatId;
+  console.log("subCategoryId", subCategoryId);
   if (!Array.isArray(quizzesData)) {
     throw new Error("Invalid quiz data. Please provide an array of quizzes.");
   }
@@ -22,10 +22,10 @@ const createQuiz = asyncHandler(async (req, res) => {
       !options ||
       options.length !== 4 ||
       !correctOption ||
-      !subSubCategoryId
+      !subCategoryId
     ) {
       throw new Error(
-        "Invalid quiz data. Each quiz should have a valid question, 4 options, correct option, and sub-subcategory ID."
+        "Invalid quiz data. Each quiz should have a valid question, 4 options, correct option, and sub-category ID."
       );
     }
 
@@ -33,7 +33,7 @@ const createQuiz = asyncHandler(async (req, res) => {
       question,
       options: quizData.options.map((option) => option.value),
       correctOption,
-      subSubCategoryId: subSubCategoryId,
+      subCategoryId: subCategoryId,
       questionStartDate: questionStartDate,
     });
 
@@ -42,17 +42,19 @@ const createQuiz = asyncHandler(async (req, res) => {
 
   res.status(201).json(quizzes);
 });
+
 // Get all quizzes
 const getAllQuizzes = asyncHandler(async (req, res) => {
-  const subSubCategoryId = req.params.subSubCategoryId; // Assuming your route has a parameter named 'subSubCategoryId'
+  console.log('req.params', req.params);
+  const subCategoryId = req.params.subCatId; // Assuming your route has a parameter named 'subSubCategoryId'
 
-  if (!subSubCategoryId) {
+  if (!subCategoryId) {
     return res
       .status(400)
-      .json({ error: "subSubCategoryId not provided in the parameters" });
+      .json({ error: "subCategoryId not provided in the parameters" });
   }
 
-  const quizzes = await Quiz.find({ subSubCategoryId }); // Filter quizzes by subSubCategoryId
+  const quizzes = await Quiz.find({ subCategoryId }); // Filter quizzes by subSubCategoryId
 
   if (!quizzes || quizzes.length === 0) {
     return res
@@ -61,7 +63,7 @@ const getAllQuizzes = asyncHandler(async (req, res) => {
   }
 
   const result = {
-    subSubCategoryId,
+    subCategoryId,
     allQuestion: quizzes.map((quiz) => ({
       _id: quiz._id,
       question: quiz.question,
