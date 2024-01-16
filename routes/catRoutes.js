@@ -35,14 +35,17 @@ router.get("/", (req, res) => {
 // router.use("/category", auth);
 // router.route("/category").post(createCategory);
 // router.route("/category").get(getCategory)
+
+router.use("/category", auth);
 router.route("/category")
   .post(createCategory)
   .get(getCategory);
 
 //@ For Read & Write SubCategory
+router.use("/subcategory", auth);
 router.route("/subcategory").get(getSubCategory).post(createSubCategory);
 
-// router.use("/subcategoryByCategory", );
+router.use("/subcategoryByCategory", auth);
 router.route("/subcategoryByCategory/:categoryId").get(getSubCategoryByCategory);
 
 //@ For Read & Write SubSubCategory

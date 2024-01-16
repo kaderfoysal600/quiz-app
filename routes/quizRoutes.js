@@ -17,7 +17,7 @@ router.get("/", (req, res) => {
 // router.use("/quiz", auth);
 // router.route("/quiz").get(getAllQuizzes).post(createQuiz);
 
-// router.use("/quiz", auth);
+router.use("/quiz", auth);
 router.route("/quiz").post(createQuiz);
 router.route("/quiz/:subCatId", auth).get(getAllQuizzes)
 

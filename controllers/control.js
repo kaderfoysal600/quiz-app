@@ -89,17 +89,20 @@ const getSubCategoryByCategory = asyncHandler(async (req, res) => {
   // Organize subcategories by category
   const organizedData = {};
 
+  // Set category name based on the provided categoryId
+  const category = await Category.findById(categoryIdFromParams);
+  const categoryName = category ? category.name : '';
+
+  if (!organizedData[categoryIdFromParams]) {
+    organizedData[categoryIdFromParams] = {
+      category_id: categoryIdFromParams,
+      category_name: categoryName,
+      sub_categories: [],
+    };
+  }
+
   subcategories.forEach((subCategory) => {
     const categoryId = subCategory.category_Id._id;
-    const categoryName = subCategory.category_Id.name;
-
-    if (!organizedData[categoryId]) {
-      organizedData[categoryId] = {
-        category_id: categoryId,
-        category_name: categoryName,
-        sub_categories: [],
-      };
-    }
 
     const { category_Id, ...subcategoryWithoutCategoryId } =
       subCategory.toObject();
@@ -109,13 +112,18 @@ const getSubCategoryByCategory = asyncHandler(async (req, res) => {
   // Check if subcategories array is empty and construct response accordingly
   const resultArray = Object.values(organizedData);
   const response =
-    resultArray.length > 0 ? resultArray[0] : {
-      category_id: categoryIdFromParams,
-      sub_categories: [],
-    };
+    resultArray.length > 0
+      ? resultArray[0]
+      : {
+          category_id: categoryIdFromParams,
+          category_name: categoryName,
+          sub_categories: [],
+        };
 
   res.status(200).json(response);
 });
+
+
 
 
 //@desc Create New Category

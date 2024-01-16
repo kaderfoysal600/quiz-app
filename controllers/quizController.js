@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Quiz = require("../models/quizModel");
+const SubCategory = require("../models/sub_cat_Models");
 const mongoose = require("mongoose");
 
 const createQuiz = asyncHandler(async (req, res) => {
@@ -55,16 +56,17 @@ const getAllQuizzes = asyncHandler(async (req, res) => {
   }
 
   const quizzes = await Quiz.find({ subCategoryId }); // Filter quizzes by subSubCategoryId
-
-  if (!quizzes || quizzes.length === 0) {
-    return res
-      .status(404)
-      .json({ error: "No quizzes found for the provided subSubCategoryId" });
-  }
-
+  const subCategory = await SubCategory.findById(subCategoryId);
+  console.log('subCategory', subCategory);
   const result = {
     subCategoryId,
-    allQuestion: quizzes.map((quiz) => ({
+    subCategoryName: subCategory?.name,
+    questionCount: quizzes.length, 
+    allQuestion: [],
+  };
+
+  if (quizzes && quizzes.length > 0) {
+    result.allQuestion = quizzes.map((quiz) => ({
       _id: quiz._id,
       question: quiz.question,
       options: quiz.options,
@@ -73,11 +75,13 @@ const getAllQuizzes = asyncHandler(async (req, res) => {
       createdAt: quiz.createdAt,
       updatedAt: quiz.updatedAt,
       __v: quiz.__v,
-    })),
-  };
+    }));
+  }
 
   res.status(200).json(result);
 });
+
+
 
 
 // Add more controllers as needed (e.g., getQuiz, updateQuiz, deleteQuiz, etc.)
