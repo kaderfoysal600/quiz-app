@@ -9,7 +9,7 @@ require("dotenv").config();
 exports.signup = async (req, res) => {
   try {
     //get input data
-    const { email, password, phoneNo, referCode } = req.body;
+    const {name, email, password, phoneNo, referCode } = req.body;
 
     // Check if All Details are there or not
     if (!email || !password) {
@@ -42,6 +42,7 @@ exports.signup = async (req, res) => {
     }
 
     const User = await user.create({
+      name,
       email,
       phoneNo,
       referCode,
