@@ -19,6 +19,7 @@ const {
   deleteSubSubCategory,
   getSubCategoryByCategory,
   getSubSubCategoriesBySub,
+  createPrimaryCategory
 } = require("../controllers/control");
 
 const validateToken = require("../middleware/errorhandler");
@@ -71,5 +72,7 @@ router
   .get(getSubCategory_id)
   .put(updateSubCategory)
   .delete(deleteSubCategory);
+
+  router.route("/primary-category").post(createPrimaryCategory);
 
 module.exports = router;

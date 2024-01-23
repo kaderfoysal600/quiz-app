@@ -1,6 +1,7 @@
 const Category = require("../models/category");
 const Subcategory = require("../models/category");
 const subSubcategory = require("../models/category");
+const primaryCategory = require("../models/primaryCategory");
 exports.createCategory = async (req, res) => {
   try {
     const { name } = req.body;
@@ -113,3 +114,7 @@ exports.getAllSubSubcategories = async (req, res) => {
     });
   }
 };
+
+
+
+

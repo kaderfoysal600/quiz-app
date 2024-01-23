@@ -3,6 +3,7 @@ const Category = require("../models/catModels");
 const SubCategory = require("../models/sub_cat_Models");
 const SubSubCategory = require("../models/sub_sub_cat_model");
 const { json } = require("body-parser");
+const primaryCategory = require("../models/primaryCategory");
 
 //@desc Get all category
 //@route GET all_category
@@ -444,6 +445,25 @@ const deleteSubSubCategory = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Sub-sub-category deleted successfully." });
 });
 
+
+const createPrimaryCategory = async (req, res) => {
+  try {
+    const { primary_category_id , email } = req.body;
+    const pCategory = await primaryCategory.create({ primary_category_id , email});
+    res.status(201).json({
+      success: true,
+      pCategory,
+      message: "Primary Category created successfully ✅",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Primary Category creation failed",
+    });
+  }
+};
+
 module.exports = {
   getCategory,
   getSubCategory,
@@ -462,4 +482,5 @@ module.exports = {
   deleteSubSubCategory,
   getSubCategoryByCategory,
   getSubSubCategoriesBySub,
+  createPrimaryCategory
 };

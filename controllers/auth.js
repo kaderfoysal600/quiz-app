@@ -3,13 +3,15 @@ const user = require("../models/user");
 const jwt = require("jsonwebtoken");
 const OTP = require("../models/OTP");
 const otpGenerator = require("otp-generator");
+const primaryCategory = require("../models/primaryCategory");
+const Category = require("../models/catModels");
 require("dotenv").config();
 //signup handle
 
 exports.signup = async (req, res) => {
   try {
     //get input data
-    const {name, email, password, phoneNo, referCode } = req.body;
+    const { name, email, password, phoneNo, referCode } = req.body;
 
     // Check if All Details are there or not
     if (!email || !password) {
@@ -94,10 +96,17 @@ exports.login = async (req, res) => {
       });
     }
 
+
+    // Find the primary category associated with the user's email
+    let pCategory = await primaryCategory.findOne({ email });
+    let pId = pCategory.primary_category_id
+    let primaryCategoryName1 = await Category.findById(pId);
+    const primaryCategoryName = primaryCategoryName1.name;
     const payload = {
       email: User.email,
       id: User._id,
     };
+
     //verify password and generate a JWt token 🔎
     if (await bcrypt.compare(password, User.password)) {
       //if password matched
@@ -113,10 +122,12 @@ exports.login = async (req, res) => {
         expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
         httpOnly: true, //It will make cookie not accessible on clinet side -> good way to keep hackers away
       };
+      
       res.cookie("token", token, options).status(200).json({
         success: true,
         token,
         User,
+        primaryCategoryName,
         message: "Logged in Successfully✅",
       });
     } else {
@@ -136,6 +147,85 @@ exports.login = async (req, res) => {
 };
 
 // Send OTP For Email Verification
+
+
+
+// exports.login = async (req, res) => {
+//   try {
+//     // data fetch
+//     const { email, password } = req.body;
+    
+//     // validation on email and password
+//     if (!email || !password) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Please fill in all the details carefully",
+//       });
+//     }
+
+//     // check for registered User
+//     let User = await user.findOne({ email });
+    
+//     // if user not registered or not found in the database
+//     if (!User) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "You have to signup first",
+//       });
+//     }
+
+//     // Find the primary category associated with the user's email
+//     let pCategory = await primaryCategory.findOne({ email });
+
+//     const payload = {
+//       email: user.email,
+//       id: user._id,
+//     };
+
+//     // verify password and generate a JWT token
+//     if (await bcrypt.compare(password, user.password)) {
+//       // if password matched
+//       // now let's create a JWT token
+//       let token = jwt.sign(payload, process.env.JWT_SECRET, {
+//         expiresIn: "2h",
+//       });
+
+//       user = user.toObject();
+//       user.token = token;
+//       user.password = undefined;
+
+//       const options = {
+//         expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+//         httpOnly: true,
+//       };
+
+//       res.cookie("token", token, options).status(200).json({
+//         success: true,
+//         token,
+//         user,
+//         primaryCategory, // Include the primaryCategory in the response
+//         message: "Logged in successfully",
+//       });
+//     } else {
+//       // password doesn't match
+//       return res.status(403).json({
+//         success: false,
+//         message: "Incorrect password",
+//       });
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Login failure: " + error,
+//     });
+//   }
+// };
+
+
+
+
+
 exports.sendotp = async (req, res) => {
   try {
     const { email } = req.body;
