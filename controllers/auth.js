@@ -119,7 +119,7 @@ exports.login = async (req, res) => {
 
       User.password = undefined;
       const options = {
-        expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+        expires: new Date(Date.now() + 7 * 72 * 60 * 60 * 1000),
         httpOnly: true, //It will make cookie not accessible on clinet side -> good way to keep hackers away
       };
       
