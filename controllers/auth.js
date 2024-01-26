@@ -112,14 +112,14 @@ exports.login = async (req, res) => {
       //if password matched
       //now lets create a JWT token
       let token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: "2h",
+        expiresIn: "48h",
       });
       User = User.toObject();
       User.token = token;
 
       User.password = undefined;
       const options = {
-        expires: new Date(Date.now() + 7 * 72 * 60 * 60 * 1000),
+        expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
         httpOnly: true, //It will make cookie not accessible on clinet side -> good way to keep hackers away
       };
       
