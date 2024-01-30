@@ -99,9 +99,9 @@ exports.login = async (req, res) => {
 
     // Find the primary category associated with the user's email
     let pCategory = await primaryCategory.findOne({ email });
-    let pId = pCategory.primary_category_id
+    let pId = pCategory?.primary_category_id
     let primaryCategoryName1 = await Category.findById(pId);
-    const primaryCategoryName = primaryCategoryName1.name;
+    const primaryCategoryName = primaryCategoryName1?.name;
     const payload = {
       email: User.email,
       id: User._id,
