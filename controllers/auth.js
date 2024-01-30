@@ -74,77 +74,77 @@ exports.signup = async (req, res) => {
   }
 };
 
-exports.login = async (req, res) => {
-  try {
-    //data fetch
-    const { email, password } = req.body;
-    //validation on email and password
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Plz fill all the details carefully",
-      });
-    }
+// exports.login = async (req, res) => {
+//   try {
+//     //data fetch
+//     const { email, password } = req.body;
+//     //validation on email and password
+//     if (!email || !password) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Plz fill all the details carefully",
+//       });
+//     }
 
-    //check for registered User
-    let User = await user.findOne({ email });
-    //if user not registered or not found in database
-    if (!User) {
-      return res.status(401).json({
-        success: false,
-        message: "You have to Signup First",
-      });
-    }
+//     //check for registered User
+//     let User = await user.findOne({ email });
+//     //if user not registered or not found in database
+//     if (!User) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "You have to Signup First",
+//       });
+//     }
 
 
-    // Find the primary category associated with the user's email
-    let pCategory = await primaryCategory.findOne({ email });
-    let pId = pCategory?.primary_category_id
-    let primaryCategoryName1 = await Category.findById(pId);
-    const primaryCategoryName = primaryCategoryName1?.name;
-    const payload = {
-      email: User.email,
-      id: User._id,
-    };
+//     // Find the primary category associated with the user's email
+//     let pCategory = await primaryCategory.findOne({ email });
+//     let pId = pCategory?.primary_category_id
+//     let primaryCategoryName1 = await Category.findById(pId);
+//     const primaryCategoryName = primaryCategoryName1?.name;
+//     const payload = {
+//       email: User.email,
+//       id: User._id,
+//     };
 
-    //verify password and generate a JWt token 🔎
-    if (await bcrypt.compare(password, User.password)) {
-      //if password matched
-      //now lets create a JWT token
-      let token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: "360h",
-      });
-      User = User.toObject();
-      User.token = token;
+//     //verify password and generate a JWt token 🔎
+//     if (await bcrypt.compare(password, User.password)) {
+//       //if password matched
+//       //now lets create a JWT token
+//       let token = jwt.sign(payload, process.env.JWT_SECRET, {
+//         expiresIn: "360h",
+//       });
+//       User = User.toObject();
+//       User.token = token;
 
-      User.password = undefined;
-      const options = {
-        expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-        httpOnly: true, //It will make cookie not accessible on clinet side -> good way to keep hackers away
-      };
+//       User.password = undefined;
+//       const options = {
+//         expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+//         httpOnly: true, //It will make cookie not accessible on clinet side -> good way to keep hackers away
+//       };
       
-      res.cookie("token", token, options).status(200).json({
-        success: true,
-        token,
-        User,
-        primaryCategoryName,
-        message: "Logged in Successfully✅",
-      });
-    } else {
-      //password donot matched
-      return res.status(403).json({
-        success: false,
-        message: "Password incorrects⚠️",
-      });
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      success: false,
-      message: "Login failure⚠️ :" + error,
-    });
-  }
-};
+//       res.cookie("token", token, options).status(200).json({
+//         success: true,
+//         token,
+//         User,
+//         primaryCategoryName,
+//         message: "Logged in Successfully✅",
+//       });
+//     } else {
+//       //password donot matched
+//       return res.status(403).json({
+//         success: false,
+//         message: "Password incorrects⚠️",
+//       });
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Login failure⚠️ :" + error,
+//     });
+//   }
+// };
 
 // Send OTP For Email Verification
 
@@ -222,6 +222,82 @@ exports.login = async (req, res) => {
 //   }
 // };
 
+exports.login = async (req, res) => {
+  try {
+    //data fetch
+    const { email, password } = req.body;
+    //validation on email and password
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Please fill all the details carefully",
+      });
+    }
+
+    //check for registered User
+    let User = await user.findOne({ email });
+    //if user not registered or not found in database
+    if (!User) {
+      return res.status(401).json({
+        success: false,
+        message: "You have to Signup First",
+      });
+    }
+
+    // Find the primary category associated with the user's email
+    let pCategory = await primaryCategory.findOne({ email });
+    
+    let primaryCategoryName = ""; // Initialize as an empty string
+
+    if (pCategory) {
+      let pId = pCategory.primary_category_id;
+      let primaryCategoryName1 = await Category.findById(pId);
+      primaryCategoryName = primaryCategoryName1 ? primaryCategoryName1.name : "";
+    }
+
+    const payload = {
+      email: User.email,
+      id: User._id,
+    };
+
+    //verify password and generate a JWt token 🔎
+    if (await bcrypt.compare(password, User.password)) {
+      //if password matched
+      //now let's create a JWT token
+      let token = jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: "360h",
+      });
+      User = User.toObject();
+      User.token = token;
+
+      User.password = undefined;
+      const options = {
+        expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+        httpOnly: true, //It will make cookie not accessible on client side -> a good way to keep hackers away
+      };
+
+      res.cookie("token", token, options).status(200).json({
+        success: true,
+        token,
+        User,
+        primaryCategoryName,
+        message: "Logged in Successfully✅",
+      });
+    } else {
+      //password don't match
+      return res.status(403).json({
+        success: false,
+        message: "Password incorrect⚠️",
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Login failure⚠️ :" + error,
+    });
+  }
+};
 
 
 
