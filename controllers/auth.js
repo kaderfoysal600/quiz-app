@@ -112,7 +112,7 @@ exports.login = async (req, res) => {
       //if password matched
       //now lets create a JWT token
       let token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: "48h",
+        expiresIn: "360h",
       });
       User = User.toObject();
       User.token = token;
