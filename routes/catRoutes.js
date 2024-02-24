@@ -73,6 +73,6 @@ router
   .put(updateSubCategory)
   .delete(deleteSubCategory);
 
-  router.route("/primary-category").post(createPrimaryCategory);
+router.route("/primary-category").post(createPrimaryCategory);
 
 module.exports = router;

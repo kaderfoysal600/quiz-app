@@ -9,10 +9,10 @@ const category_schema = mongoose.Schema({
     type: String,
     required: true
   },
-  defaultCategory: {
-    type: Boolean,
-    default: false
-  }
+  // defaultCategory: {
+  //   type: Boolean,
+  //   default: false
+  // }
 
 });
 

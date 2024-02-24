@@ -8,26 +8,39 @@ const primaryCategory = require("../models/primaryCategory");
 //@desc Get all category
 //@route GET all_category
 //@access private
+// const getCategory = asyncHandler(async (req, res) => {
+//   const categories = await Category.find();
+//   res.status(200).json(categories);
+// });
+
 const getCategory = asyncHandler(async (req, res) => {
-  const categories = await Category.find({}).sort({ defaultCategory: -1 });
+  // Get the email from the request header
+  const email = req.headers.email;
+
+  // Find the primary category with the given email
+  const primaryCat = await primaryCategory.findOne({ email });
+
+  if (!primaryCat) {
+    // If primary category not found, return all categories as usual
+    const categories = await Category.find();
+    res.status(200).json(categories);
+    return;
+  }
+
+  // Find all categories
+  const categories = await Category.find();
+
+  // Sort categories array to prioritize the category with the matching primary_category_id
+  categories.sort((a, b) => {
+    if (a._id.toString() === primaryCat.primary_category_id) return -1;
+    if (b._id.toString() === primaryCat.primary_category_id) return 1;
+    return 0;
+  });
 
   res.status(200).json(categories);
 });
-//@desc Get all Subcategory
-//@route GET all Sub_subcategory
-//@access private
-// const getSubCategory = asyncHandler(async (req, res) => {
-//   // Use populate to include category information
-//   const subcategories = await SubCategory.find(req.params)
-//     .populate({
-//       path: "category_Id",
-//       model: "Category",
-//       select: "name", // Select the fields you want from the Category model
-//     })
-//     .exec();
 
-//   res.status(200).json(subcategories);
-// });
+
 
 const getSubCategory = asyncHandler(async (req, res) => {
   // Use populate to include category information
@@ -132,15 +145,14 @@ const getSubCategoryByCategory = asyncHandler(async (req, res) => {
 //@access private
 const createCategory = asyncHandler(async (req, res) => {
   console.log("The request body of category is :", req.body);
-  const { name, description , defaultCategory} = req.body;
+  const { name, description } = req.body;
   if (!name || !description) {
     res.status(400);
     throw new Error("fill the all required field");
   }
   const cate = await Category.create({
     name,
-    description,
-    defaultCategory
+    description
   });
 
   res.status(201).json(cate);
@@ -450,6 +462,7 @@ const createPrimaryCategory = async (req, res) => {
   try {
     const { primary_category_id , email } = req.body;
     const pCategory = await primaryCategory.create({ primary_category_id , email});
+    
     res.status(201).json({
       success: true,
       pCategory,
