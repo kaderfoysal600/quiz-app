@@ -5,6 +5,7 @@ const OTP = require("../models/OTP");
 const otpGenerator = require("otp-generator");
 const primaryCategory = require("../models/primaryCategory");
 const Category = require("../models/catModels");
+const profile = require("../models/profile");
 require("dotenv").config();
 //signup handle
 
@@ -295,6 +296,86 @@ exports.login = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Login failure⚠️ :" + error,
+    });
+  }
+};
+
+
+
+exports.createProfile = async (req, res) => {
+  try {
+    const userId = req.user.id; // Assuming you have user information in the request after authentication
+    const { bio, profilePicture } = req.body; // Additional profile details
+
+    // Check if user exists
+    const existingUser = await user.findById(userId);
+    if (!existingUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    // Create profile
+    const profile = await profile.create({
+      userId,
+      bio,
+      profilePicture,
+    });
+
+    return res.status(201).json({
+      success: true,
+      profile,
+      message: "Profile created successfully ✅",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Profile creation failed",
+    });
+  }
+};
+
+
+exports.editProfile = async (req, res) => {
+  try {
+    const userId = req.user.id; // Assuming you have user information in the request after authentication
+    const { bio, profilePicture } = req.body; // Updated profile details
+
+    // Check if user exists
+    const existingUser = await user.findById(userId);
+    if (!existingUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    // Check if profile exists
+    const existingProfile = await Profile.findOne({ userId });
+    if (!existingProfile) {
+      return res.status(404).json({
+        success: false,
+        message: "Profile not found.",
+      });
+    }
+
+    // Update profile
+    existingProfile.bio = bio;
+    existingProfile.profilePicture = profilePicture;
+    await existingProfile.save();
+
+    return res.status(200).json({
+      success: true,
+      profile: existingProfile,
+      message: "Profile updated successfully ✅",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Profile update failed",
     });
   }
 };

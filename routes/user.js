@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 //Handlers from controllers
-const { login, signup, sendotp, verifyOtp } = require("../controllers/auth");
+const { login, signup, sendotp, verifyOtp, createProfile, editProfile } = require("../controllers/auth");
 const { auth } = require("../middlewares/authMiddle");
 
 router.post("/login", login);
@@ -31,5 +31,8 @@ router.get("/test", auth, (req, res) => {
 //         message: "You are a valid Admin 😎"
 //     })
 // })
+
+router.post('/profile/create', auth, createProfile);
+router.put('/profile/edit', auth, editProfile);
 
 module.exports = router;
