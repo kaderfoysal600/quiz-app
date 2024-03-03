@@ -5,7 +5,7 @@ const OTP = require("../models/OTP");
 const otpGenerator = require("otp-generator");
 const primaryCategory = require("../models/primaryCategory");
 const Category = require("../models/catModels");
-const profile = require("../models/profile");
+const Profile = require("../models/profile");
 require("dotenv").config();
 //signup handle
 
@@ -42,7 +42,8 @@ exports.signup = async (req, res) => {
         success: false,
         message: `Hashing pasword error for ${password}: ` + error.message,
       });
-    }
+    } // Generate 6-digit UIID
+    const uiId = generateUIID();
 
     const User = await user.create({
       name,
@@ -50,7 +51,18 @@ exports.signup = async (req, res) => {
       phoneNo,
       referCode,
       password: hashedPassword,
+      uiId, // Include generated UIID
     });
+
+    // Create profile
+    const newProfile = new Profile({
+      userEmail: email,
+      userName: name,
+      uiId: uiId,
+    });
+
+    await newProfile.save();
+
     var otp = otpGenerator.generate(6, {
       upperCaseAlphabets: false,
       lowerCaseAlphabets: false,
@@ -75,6 +87,13 @@ exports.signup = async (req, res) => {
   }
 };
 
+// Function to generate 6-digit UIID
+function generateUIID() {
+  const min = 100000;
+  const max = 999999;
+  return String(Math.floor(Math.random() * (max - min + 1)) + min);
+}
+
 // exports.login = async (req, res) => {
 //   try {
 //     //data fetch
@@ -96,7 +115,6 @@ exports.signup = async (req, res) => {
 //         message: "You have to Signup First",
 //       });
 //     }
-
 
 //     // Find the primary category associated with the user's email
 //     let pCategory = await primaryCategory.findOne({ email });
@@ -123,7 +141,7 @@ exports.signup = async (req, res) => {
 //         expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
 //         httpOnly: true, //It will make cookie not accessible on clinet side -> good way to keep hackers away
 //       };
-      
+
 //       res.cookie("token", token, options).status(200).json({
 //         success: true,
 //         token,
@@ -149,13 +167,11 @@ exports.signup = async (req, res) => {
 
 // Send OTP For Email Verification
 
-
-
 // exports.login = async (req, res) => {
 //   try {
 //     // data fetch
 //     const { email, password } = req.body;
-    
+
 //     // validation on email and password
 //     if (!email || !password) {
 //       return res.status(400).json({
@@ -166,7 +182,7 @@ exports.signup = async (req, res) => {
 
 //     // check for registered User
 //     let User = await user.findOne({ email });
-    
+
 //     // if user not registered or not found in the database
 //     if (!User) {
 //       return res.status(401).json({
@@ -247,13 +263,15 @@ exports.login = async (req, res) => {
 
     // Find the primary category associated with the user's email
     let pCategory = await primaryCategory.findOne({ email });
-    
+
     let primaryCategoryName = ""; // Initialize as an empty string
 
     if (pCategory) {
       let pId = pCategory.primary_category_id;
       let primaryCategoryName1 = await Category.findById(pId);
-      primaryCategoryName = primaryCategoryName1 ? primaryCategoryName1.name : "";
+      primaryCategoryName = primaryCategoryName1
+        ? primaryCategoryName1.name
+        : "";
     }
 
     const payload = {
@@ -300,88 +318,126 @@ exports.login = async (req, res) => {
   }
 };
 
+// exports.createProfile = async (req, res) => {
+//   try {
+//     const userId = req.user.id; // Assuming you have user information in the request after authentication
+//     const { bio, profilePicture } = req.body; // Additional profile details
 
+//     // Check if user exists
+//     const existingUser = await user.findById(userId);
+//     if (!existingUser) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "User not found.",
+//       });
+//     }
 
-exports.createProfile = async (req, res) => {
+//     // Create profile
+//     const profile = await Profile.create({
+//       userId,
+//       bio,
+//       profilePicture,
+//     });
+
+//     return res.status(201).json({
+//       success: true,
+//       profile,
+//       message: "Profile created successfully ✅",
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Profile creation failed",
+//     });
+//   }
+// };
+
+exports.getProfileByEmail = async (req, res) => {
   try {
-    const userId = req.user.id; // Assuming you have user information in the request after authentication
-    const { bio, profilePicture } = req.body; // Additional profile details
+    const email = req.headers["email"];
 
-    // Check if user exists
-    const existingUser = await user.findById(userId);
-    if (!existingUser) {
-      return res.status(404).json({
+    // Check if email is provided
+    if (!email) {
+      return res.status(400).json({
         success: false,
-        message: "User not found.",
+        message: "Email is required",
       });
     }
 
-    // Create profile
-    const profile = await profile.create({
-      userId,
-      bio,
-      profilePicture,
-    });
+    // Find profile by email
+    const profile = await Profile.findOne({ userEmail: email });
 
-    return res.status(201).json({
-      success: true,
-      profile,
-      message: "Profile created successfully ✅",
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      success: false,
-      message: "Profile creation failed",
-    });
-  }
-};
-
-
-exports.editProfile = async (req, res) => {
-  try {
-    const userId = req.user.id; // Assuming you have user information in the request after authentication
-    const { bio, profilePicture } = req.body; // Updated profile details
-
-    // Check if user exists
-    const existingUser = await user.findById(userId);
-    if (!existingUser) {
+    if (!profile) {
       return res.status(404).json({
         success: false,
-        message: "User not found.",
+        message: "Profile not found",
       });
     }
-
-    // Check if profile exists
-    const existingProfile = await Profile.findOne({ userId });
-    if (!existingProfile) {
-      return res.status(404).json({
-        success: false,
-        message: "Profile not found.",
-      });
-    }
-
-    // Update profile
-    existingProfile.bio = bio;
-    existingProfile.profilePicture = profilePicture;
-    await existingProfile.save();
 
     return res.status(200).json({
       success: true,
-      profile: existingProfile,
-      message: "Profile updated successfully ✅",
+      profile,
+      message: "Profile found successfully",
     });
   } catch (error) {
     console.error(error);
     return res.status(500).json({
       success: false,
-      message: "Profile update failed",
+      message: "Failed to fetch profile",
     });
   }
 };
 
+exports.editProfile = async (req, res) => {
+  try {
+    const { email, name, profilePicture } = req.body;
 
+    // Check if email is provided
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required",
+      });
+    }
 
+    // Find the profile by email
+    let profile = await Profile.findOne({ userEmail: email });
+
+    // If profile not found, return 404
+    if (!profile) {
+      return res.status(404).json({
+        success: false,
+        message: "Profile not found",
+      });
+    }
+
+    // Update name if provided
+    if (name) {
+      profile.userName = name;
+    }
+
+    // Update profilePicture if provided
+    if (profilePicture) {
+      profile.profilePicture = profilePicture;
+    }
+
+    // Save the updated profile
+    await profile.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      profile,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update profile",
+    });
+  }
+};
 
 exports.sendotp = async (req, res) => {
   try {
