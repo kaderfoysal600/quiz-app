@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
-
+const multer = require("multer");
 //Handlers from controllers
-const { login, signup, sendotp, verifyOtp, editProfile , getProfileByEmail} = require("../controllers/auth");
+const { login, signup, sendotp, verifyOtp, editProfile , getProfileByEmail, saveProfileWithImage} = require("../controllers/auth");
 const { auth } = require("../middlewares/authMiddle");
 
 router.post("/login", login);
@@ -10,6 +10,18 @@ router.post("/signup", signup);
 router.post("/verifyOtp", verifyOtp);
 router.post("/sendotp", sendotp);
 
+
+var storage = multer.diskStorage({
+  // @ts-ignore
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  // @ts-ignore
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+var upload = multer({ storage: storage });
 //testing protected route
 router.get("/test", auth, (req, res) => {
   res.json({
@@ -33,6 +45,8 @@ router.get("/test", auth, (req, res) => {
 // })
 router.get('/getProfileByEmail', getProfileByEmail)
 
-router.put('/profile/edit', auth, editProfile);
+// router.put('/profile/edit', auth, editProfile);
+router.put('/profile/edit', upload.single("photo"), saveProfileWithImage);
+
 
 module.exports = router;

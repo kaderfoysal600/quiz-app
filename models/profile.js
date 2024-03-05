@@ -13,7 +13,7 @@ const profileSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
-  profilePicture: {
+  photo: {
     type: String,
     default: "",
   },

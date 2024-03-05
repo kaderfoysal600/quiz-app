@@ -6,6 +6,8 @@ const otpGenerator = require("otp-generator");
 const primaryCategory = require("../models/primaryCategory");
 const Category = require("../models/catModels");
 const Profile = require("../models/profile");
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
 require("dotenv").config();
 //signup handle
 
@@ -389,53 +391,101 @@ exports.getProfileByEmail = async (req, res) => {
   }
 };
 
-exports.editProfile = async (req, res) => {
+// exports.editProfile = async (req, res) => {
+//   try {
+//     const { email, name, profilePicture } = req.body;
+
+//     // Check if email is provided
+//     if (!email) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Email is required",
+//       });
+//     }
+
+//     // Find the profile by email
+//     let profile = await Profile.findOne({ userEmail: email });
+
+//     // If profile not found, return 404
+//     if (!profile) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Profile not found",
+//       });
+//     }
+
+//     // Update name if provided
+//     if (name) {
+//       profile.userName = name;
+//     }
+
+//     // Update profilePicture if provided
+//     if (profilePicture) {
+//       profile.profilePicture = profilePicture;
+//     }
+
+//     // Save the updated profile
+//     await profile.save();
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "Profile updated successfully",
+//       profile,
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Failed to update profile",
+//     });
+//   }
+// };
+
+exports.saveProfileWithImage = async (req, res) => {
   try {
-    const { email, name, profilePicture } = req.body;
+    console.log('req.body', req.body)
+      const email = req.body.email;
+      const name = req.body.name;
+      
+      // Check if email is provided
+      if (!email) {
+          return res.status(400).json({
+              success: false,
+              message: "Email is required",
+          });
+      }
 
-    // Check if email is provided
-    if (!email) {
-      return res.status(400).json({
-        success: false,
-        message: "Email is required",
+      // Find profile by email
+      let profile = await Profile.findOne({ userEmail: email });
+
+      if (!profile) {
+          // Create a new profile if not found
+          profile = new Profile();
+      }
+
+      // Check if file is uploaded
+      if (req.file) {
+          // Save the path of the uploaded image in the profile
+          profile.photo = req.file.path; // Assuming you save the image path
+      }
+
+      // Save other profile fields if needed
+      profile.userEmail = email;
+      profile.name = name; // Assuming "name" is another field in your profile model
+
+      await profile.save();
+
+      return res.status(200).json({
+          success: true,
+          profile,
+          message: "Profile saved successfully",
       });
-    }
-
-    // Find the profile by email
-    let profile = await Profile.findOne({ userEmail: email });
-
-    // If profile not found, return 404
-    if (!profile) {
-      return res.status(404).json({
-        success: false,
-        message: "Profile not found",
-      });
-    }
-
-    // Update name if provided
-    if (name) {
-      profile.userName = name;
-    }
-
-    // Update profilePicture if provided
-    if (profilePicture) {
-      profile.profilePicture = profilePicture;
-    }
-
-    // Save the updated profile
-    await profile.save();
-
-    return res.status(200).json({
-      success: true,
-      message: "Profile updated successfully",
-      profile,
-    });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to update profile",
-    });
+      console.error(error);
+      return res.status(500).json({
+          success: false,
+          message: "Failed to save profile",
+      });
   }
 };
 
