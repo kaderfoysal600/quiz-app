@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 //Handlers from controllers
-const { login, signup, sendotp, verifyOtp, editProfile , getProfileByEmail, saveProfileWithImage} = require("../controllers/auth");
+const { login, signup, sendotp, verifyOtp, editProfile , getProfileByEmail, saveProfileWithImage , countReferralCode} = require("../controllers/auth");
 const { auth } = require("../middlewares/authMiddle");
 
 router.post("/login", login);
@@ -49,4 +49,5 @@ router.get('/getProfileByEmail', getProfileByEmail)
 router.put('/profile/edit', upload.single("photo"), saveProfileWithImage);
 
 
+router.get("/referral/count", countReferralCode);
 module.exports = router;

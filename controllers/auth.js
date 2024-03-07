@@ -572,3 +572,30 @@ exports.verifyOtp = async (req, res) => {
     });
   }
 };
+
+
+exports.countReferralCode = async (req, res) => {
+  try {
+    const userEmail = req.body.email; // Assuming email is passed in the query string
+    // Find the user by email to get their referral code
+    const User = await user.findOne({ email: userEmail });
+    
+    if (!User) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const referralCode = User.referCode;
+    
+    if (!referralCode) {
+      return res.status(400).json({ message: "User does not have a referral code" });
+    }
+
+    // Count the number of users who have used the same referral code
+    const referralCount = await await user.find({ referCode: referralCode }).count();
+
+    res.json({ referralCount });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
