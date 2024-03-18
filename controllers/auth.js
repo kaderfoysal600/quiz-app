@@ -471,7 +471,7 @@ exports.saveProfileWithImage = async (req, res) => {
 
       // Save other profile fields if needed
       profile.userEmail = email;
-      profile.name = name; // Assuming "name" is another field in your profile model
+      profile.userName = name; // Assuming "name" is another field in your profile model
 
       await profile.save();
 
