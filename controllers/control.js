@@ -15,10 +15,12 @@ const primaryCategory = require("../models/primaryCategory");
 
 const getCategory = asyncHandler(async (req, res) => {
   // Get the email from the request header
-  const email = req.headers.email;
+  const email = req.body.email;
 
   // Find the primary category with the given email
   const primaryCat = await primaryCategory.findOne({ email });
+
+  console.log('primaryCat', primaryCat)
 
   if (!primaryCat) {
     // If primary category not found, return all categories as usual
