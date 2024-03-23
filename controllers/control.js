@@ -13,6 +13,34 @@ const primaryCategory = require("../models/primaryCategory");
 //   res.status(200).json(categories);
 // });
 
+// const getCategory = asyncHandler(async (req, res) => {
+//   // Get the email from the request header
+//   const email = req.body.email;
+
+//   // Find the primary category with the given email
+//   const primaryCat = await primaryCategory.findOne({ email });
+
+//   console.log('primaryCat', primaryCat)
+
+//   if (!primaryCat) {
+//     // If primary category not found, return all categories as usual
+//     const categories = await Category.find();
+//     res.status(200).json(categories);
+//     return;
+//   }
+
+//   // Find all categories
+//   const categories = await Category.find();
+
+//   // Sort categories array to prioritize the category with the matching primary_category_id
+//   categories.sort((a, b) => {
+//     if (a._id.toString() === primaryCat.primary_category_id) return -1;
+//     if (b._id.toString() === primaryCat.primary_category_id) return 1;
+//     return 0;
+//   });
+
+//   res.status(200).json(categories);
+// });
 const getCategory = asyncHandler(async (req, res) => {
   // Get the email from the request header
   const email = req.body.email;
@@ -32,14 +60,19 @@ const getCategory = asyncHandler(async (req, res) => {
   // Find all categories
   const categories = await Category.find();
 
-  // Sort categories array to prioritize the category with the matching primary_category_id
-  categories.sort((a, b) => {
-    if (a._id.toString() === primaryCat.primary_category_id) return -1;
-    if (b._id.toString() === primaryCat.primary_category_id) return 1;
+  // Move the primary category to the top of the array
+  const sortedCategories = categories.map(cat => ({
+    ...cat.toObject(),
+    isPrimary: cat._id.toString() === primaryCat.primary_category_id
+  }));
+
+  sortedCategories.sort((a, b) => {
+    if (a.isPrimary) return -1;
+    if (b.isPrimary) return 1;
     return 0;
   });
 
-  res.status(200).json(categories);
+  res.status(200).json(sortedCategories);
 });
 
 
@@ -462,22 +495,40 @@ const deleteSubSubCategory = asyncHandler(async (req, res) => {
 
 const createPrimaryCategory = async (req, res) => {
   try {
-    const { primary_category_id , email } = req.body;
-    const pCategory = await primaryCategory.create({ primary_category_id , email});
-    
-    res.status(201).json({
-      success: true,
-      pCategory,
-      message: "Primary Category created successfully ✅",
-    });
+    const { primary_category_id, email } = req.body;
+
+    // Check if a primary category already exists for the email
+    let existingPrimaryCategory = await primaryCategory.findOne({ email });
+
+    if (existingPrimaryCategory) {
+      // Update the existing primary category
+      existingPrimaryCategory.primary_category_id = primary_category_id;
+      await existingPrimaryCategory.save();
+
+      res.status(200).json({
+        success: true,
+        pCategory: existingPrimaryCategory,
+        message: "Primary Category updated successfully ✅",
+      });
+    } else {
+      // Create a new primary category
+      const newPrimaryCategory = await primaryCategory.create({ primary_category_id, email });
+
+      res.status(201).json({
+        success: true,
+        pCategory: newPrimaryCategory,
+        message: "Primary Category created successfully ✅",
+      });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({
       success: false,
-      message: "Primary Category creation failed",
+      message: "Primary Category creation/update failed",
     });
   }
 };
+
 
 module.exports = {
   getCategory,
