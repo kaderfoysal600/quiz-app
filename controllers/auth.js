@@ -444,9 +444,10 @@ exports.getProfileByEmail = async (req, res) => {
 exports.saveProfileWithImage = async (req, res) => {
   try {
     console.log('req.body', req.body)
+    console.log('req.file?', req.file?.buffer)
       const email = req.body.email;
       const name = req.body.name;
-      
+
       // Check if email is provided
       if (!email) {
           return res.status(400).json({
@@ -466,7 +467,7 @@ exports.saveProfileWithImage = async (req, res) => {
       // Check if file is uploaded
       if (req.file) {
           // Save the path of the uploaded image in the profile
-          profile.photo = req.file.path; // Assuming you save the image path
+          profile.photo = req.file?.buffer.toString("base64") // Assuming you save the image path
       }
 
       // Save other profile fields if needed

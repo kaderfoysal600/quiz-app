@@ -4,6 +4,8 @@ const multer = require("multer");
 //Handlers from controllers
 const { login, signup, sendotp, verifyOtp, editProfile , getProfileByEmail, saveProfileWithImage , countReferralCode} = require("../controllers/auth");
 const { auth } = require("../middlewares/authMiddle");
+const setResponseObject = require("../middlewares/setResponse");
+const upload = require("../utils/multer");
 
 router.post("/login", login);
 router.post("/signup", signup);
@@ -21,7 +23,7 @@ var storage = multer.diskStorage({
     cb(null, Date.now() + "-" + file.originalname);
   },
 });
-var upload = multer({ storage: storage });
+// var upload = multer({ storage: storage });
 //testing protected route
 router.get("/test", auth, (req, res) => {
   res.json({
@@ -46,7 +48,7 @@ router.get("/test", auth, (req, res) => {
 router.get('/getProfileByEmail', getProfileByEmail)
 
 // router.put('/profile/edit', auth, editProfile);
-router.put('/profile/edit', upload.single("photo"), saveProfileWithImage);
+router.put('/profile/edit', setResponseObject ,upload.single("file"), saveProfileWithImage);
 
 
 router.get("/referral/count", countReferralCode);
