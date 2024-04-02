@@ -357,8 +357,7 @@ exports.login = async (req, res) => {
 
 exports.getProfileByEmail = async (req, res) => {
   try {
-    const email = req.headers["email"];
-
+    const { email } = req.body;
     // Check if email is provided
     if (!email) {
       return res.status(400).json({
@@ -594,7 +593,7 @@ exports.countReferralCode = async (req, res) => {
     // Count the number of users who have used the same referral code
     const referralCount = await await user.find({ referCode: referralCode }).count();
 
-    res.json({ referralCount });
+    res.json({ referralCode , referralCount });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ message: "Internal server error" });
