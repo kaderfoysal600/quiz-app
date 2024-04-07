@@ -3,6 +3,47 @@ const Quiz = require("../models/quizModel");
 const SubCategory = require("../models/sub_cat_Models");
 const mongoose = require("mongoose");
 
+// const createQuiz = asyncHandler(async (req, res) => {
+//   console.log("req.query.sub_category_id", req.query.subCatId);
+//   console.log("req.body", req.body);
+//   const quizzesData = req.body;
+//   const subCategoryId = req.query.subCatId;
+//   console.log("subCategoryId", subCategoryId);
+//   if (!Array.isArray(quizzesData)) {
+//     throw new Error("Invalid quiz data. Please provide an array of quizzes.");
+//   }
+
+//   const quizzes = [];
+
+//   for (const quizData of quizzesData) {
+//     const { question, options, correctOption, questionStartDate } = quizData;
+
+//     if (
+//       !question ||
+//       !options ||
+//       options.length !== 4 ||
+//       !correctOption ||
+//       !subCategoryId
+//     ) {
+//       throw new Error(
+//         "Invalid quiz data. Each quiz should have a valid question, 4 options, correct option, and sub-category ID."
+//       );
+//     }
+
+//     const quiz = await Quiz.create({
+//       question,
+//       options: quizData.options.map((option) => option.value),
+//       correctOption,
+//       subCategoryId: subCategoryId,
+//       questionStartDate: questionStartDate,
+//     });
+
+//     quizzes.push(quiz);
+//   }
+
+//   res.status(201).json(quizzes);
+// });
+
 const createQuiz = asyncHandler(async (req, res) => {
   console.log("req.query.sub_category_id", req.query.subCatId);
   console.log("req.body", req.body);
@@ -15,34 +56,46 @@ const createQuiz = asyncHandler(async (req, res) => {
 
   const quizzes = [];
 
-  for (const quizData of quizzesData) {
-    const { question, options, correctOption, questionStartDate } = quizData;
+  try {
+    for (let i = 0; i < quizzesData.length; i++) {
+      const { question, options, correctOption, questionStartDate } = quizzesData[i];
 
-    if (
-      !question ||
-      !options ||
-      options.length !== 4 ||
-      !correctOption ||
-      !subCategoryId
-    ) {
-      throw new Error(
-        "Invalid quiz data. Each quiz should have a valid question, 4 options, correct option, and sub-category ID."
-      );
+      if (
+        !question ||
+        !options ||
+        options.length !== 4 ||
+        !correctOption ||
+        !subCategoryId
+      ) {
+        throw new Error(
+          "Invalid quiz data. Each quiz should have a valid question, 4 options, correct option, and sub-category ID."
+        );
+      }
+
+      let showAdd = false;
+      if ((i + 1) % 7 === 4) {
+        showAdd = true;
+      }
+
+      const quiz = await Quiz.create({
+        question,
+        options: options.map(option => option.value),
+        correctOption,
+        subCategoryId,
+        questionStartDate,
+        showAdd,
+      });
+
+      quizzes.push(quiz);
     }
 
-    const quiz = await Quiz.create({
-      question,
-      options: quizData.options.map((option) => option.value),
-      correctOption,
-      subCategoryId: subCategoryId,
-      questionStartDate: questionStartDate,
-    });
-
-    quizzes.push(quiz);
+    res.status(201).json(quizzes);
+  } catch (error) {
+    console.error("Error creating quiz:", error.message);
+    res.status(500).json({ error: "Internal server error" });
   }
-
-  res.status(201).json(quizzes);
 });
+
 
 // Get all quizzes
 const getAllQuizzes = asyncHandler(async (req, res) => {

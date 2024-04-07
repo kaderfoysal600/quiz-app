@@ -35,6 +35,10 @@ const QuizSchema = new mongoose.Schema(
       type: Date, // Adjust the type according to your requirements
       required: true,
     },
+    showAdd: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
