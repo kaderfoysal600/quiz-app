@@ -25,9 +25,11 @@ const categoryRouter = require("./routes/catRoutes");
 // const category = require("./routes/category");
 
 const quizRouter = require("./routes/quizRoutes");
+const todaysUpdateRouter = require("./routes/TodaysUpdateRoute");
 app.use("/api/v1", user);
 app.use("/api/v1", categoryRouter);
 app.use("/api/v1", quizRouter);
+app.use("/api/v1", todaysUpdateRouter);
 
 app.listen(PORT, () => {
   console.log("Server Started");
