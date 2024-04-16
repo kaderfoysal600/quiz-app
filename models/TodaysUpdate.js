@@ -25,7 +25,6 @@ const TodaysUpdateSchema = new mongoose.Schema(
     userEmail: {
       type: String,
       required: false,
-      default: 0,
     },
     points: {
         type: Number,
