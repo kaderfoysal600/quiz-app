@@ -7,6 +7,7 @@ const primaryCategory = require("../models/primaryCategory");
 const Category = require("../models/catModels");
 const Profile = require("../models/profile");
 const multer = require("multer");
+const TodaysUpdate = require("../models/TodaysUpdate");
 const upload = multer({ dest: "uploads/" });
 require("dotenv").config();
 //signup handle
@@ -296,6 +297,26 @@ exports.login = async (req, res) => {
         expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
         httpOnly: true, //It will make cookie not accessible on client side -> a good way to keep hackers away
       };
+
+
+
+      const today = new Date().toISOString().slice(0, 10); // Get current date in YYYY-MM-DD format
+
+      let existingUpdate = await TodaysUpdate.findOne({ userEmail: email, date: today });
+
+      if (!existingUpdate) {
+        const todaysUpdate = new TodaysUpdate({
+          userEmail: email,
+          date: today,
+          totalPlayingQuiz: 0,
+          totalTime: 0,
+          totalQuiz: 0,
+          totalCorrectAnswers: 0,
+          points: 0,
+        });
+
+        await todaysUpdate.save();
+      }
 
       res.cookie("token", token, options).status(200).json({
         success: true,
