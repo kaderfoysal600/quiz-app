@@ -22,6 +22,11 @@ const TodaysUpdateSchema = new mongoose.Schema(
       required: false,
       default: 0,
     },
+    totalWrongAnswers: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
     userEmail: {
       type: String,
       required: false,

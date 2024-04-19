@@ -312,6 +312,7 @@ exports.login = async (req, res) => {
           totalTime: 0,
           totalQuiz: 0,
           totalCorrectAnswers: 0,
+          totalWrongAnswers:0,
           points: 0,
         });
 

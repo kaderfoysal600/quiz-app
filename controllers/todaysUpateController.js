@@ -10,9 +10,11 @@ const createTodaysUpdate = async (req, res) => {
       totalTime,
       totalQuiz,
       totalCorrectAnswers,
+      totalWrongAnswers,
       userEmail,
       date,
       points,
+
     } = req.body;
 
     const todaysUpdate = new TodaysUpdate({
@@ -77,6 +79,7 @@ const updateTodaysUpdate = async (req, res) => {
         totalTime,
         totalQuiz,
         totalCorrectAnswers,
+        totalWrongAnswers,
         date,
         points,
       } = req.body;
