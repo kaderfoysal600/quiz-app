@@ -91,6 +91,7 @@ const updateTodaysUpdate = async (req, res) => {
           totalTime,
           totalQuiz,
           totalCorrectAnswers,
+          totalWrongAnswers,
           date,
           points,
         },
