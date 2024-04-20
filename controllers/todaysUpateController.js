@@ -69,37 +69,33 @@ const getTodaysUpdateByUser = async (req, res) => {
 // @route   PUT /api/todaysupdate/:id
 // @access  Public
 const updateTodaysUpdate = async (req, res) => {
-    try {
-      const { userEmail } = req.body; // Extract userEmail from req.body
-      const {
-        totalTime,
+  try {
+    const { userEmail, totalCorrectAnswers, totalQuiz, date } = req.body;
+
+    const totalWrongAnswers = totalQuiz - totalCorrectAnswers;
+
+    const todaysUpdate = await TodaysUpdate.findOneAndUpdate(
+      { userEmail },
+      {
+        totalTime: req.body.totalTime,
         totalQuiz,
         totalCorrectAnswers,
         totalWrongAnswers,
         date,
-      } = req.body;
-  
-      const todaysUpdate = await TodaysUpdate.findOneAndUpdate(
-        { userEmail }, // Finding document by userEmail
-        {
-          totalTime,
-          totalQuiz,
-          totalCorrectAnswers,
-          totalWrongAnswers,
-          date,
-        },
-        { new: true }
-      );
-  
-      if (!todaysUpdate) {
-        return res.status(404).json({ success: false, error: "TodaysUpdate not found" });
-      }
-  
-      res.status(200).json({ success: true, data: todaysUpdate });
-    } catch (error) {
-      res.status(500).json({ success: false, error: error.message });
+      },
+      { new: true }
+    );
+
+    if (!todaysUpdate) {
+      return res.status(404).json({ success: false, error: "TodaysUpdate not found" });
     }
-  };
+
+    res.status(200).json({ success: true, data: todaysUpdate });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
   
 
 module.exports = { createTodaysUpdate, getAllTodaysUpdate, updateTodaysUpdate , getTodaysUpdateByUser };
