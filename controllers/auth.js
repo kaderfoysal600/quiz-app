@@ -308,12 +308,10 @@ exports.login = async (req, res) => {
         const todaysUpdate = new TodaysUpdate({
           userEmail: email,
           date: today,
-          totalPlayingQuiz: 0,
           totalTime: 0,
           totalQuiz: 0,
           totalCorrectAnswers: 0,
           totalWrongAnswers:0,
-          points: 0,
         });
 
         await todaysUpdate.save();

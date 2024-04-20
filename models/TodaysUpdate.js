@@ -2,11 +2,6 @@ const mongoose = require("mongoose");
 
 const TodaysUpdateSchema = new mongoose.Schema(
   {
-    totalPlayingQuiz: {
-      type: Number,
-      required: false,
-      default: 0,
-    },
     totalTime: {
       type: Number,
       required: false,

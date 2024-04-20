@@ -6,25 +6,22 @@ const TodaysUpdate = require("../models/TodaysUpdate");
 const createTodaysUpdate = async (req, res) => {
   try {
     const {
-      totalPlayingQuiz,
       totalTime,
       totalQuiz,
       totalCorrectAnswers,
       totalWrongAnswers,
       userEmail,
       date,
-      points,
 
     } = req.body;
 
     const todaysUpdate = new TodaysUpdate({
-      totalPlayingQuiz,
       totalTime,
       totalQuiz,
       totalCorrectAnswers,
+      totalWrongAnswers,
       userEmail,
       date,
-      points,
     });
 
     await todaysUpdate.save();
@@ -75,25 +72,21 @@ const updateTodaysUpdate = async (req, res) => {
     try {
       const { userEmail } = req.body; // Extract userEmail from req.body
       const {
-        totalPlayingQuiz,
         totalTime,
         totalQuiz,
         totalCorrectAnswers,
         totalWrongAnswers,
         date,
-        points,
       } = req.body;
   
       const todaysUpdate = await TodaysUpdate.findOneAndUpdate(
         { userEmail }, // Finding document by userEmail
         {
-          totalPlayingQuiz,
           totalTime,
           totalQuiz,
           totalCorrectAnswers,
           totalWrongAnswers,
           date,
-          points,
         },
         { new: true }
       );
