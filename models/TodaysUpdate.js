@@ -26,10 +26,6 @@ const TodaysUpdateSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    points: {
-        type: Number,
-        default: 0,
-      },
     date: {
       type: Date,
       required: false,
